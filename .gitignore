@@ -1,0 +1,7 @@
+build/
+*.apk
+*.keystore
+*.keystore.pwd
+*.log
+.DS_Store
+Thumbs.db
