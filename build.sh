@@ -95,10 +95,10 @@ else
 fi
 "$BT/zipalign" -f -p 4 "$OUT/unsigned.apk" "$OUT/aligned.apk"
 "$APKSIGNER" sign --ks "$KS" --ks-pass "pass:$KS_PASS" --key-pass "pass:$KS_PASS" \
-  --ks-key-alias "$KEY_ALIAS" --out "$OUT/seekseek-1.0.1.apk" "$OUT/aligned.apk"
-"$APKSIGNER" verify "$OUT/seekseek-1.0.1.apk"
+  --ks-key-alias "$KEY_ALIAS" --out "$OUT/seekseek-1.0.2.apk" "$OUT/aligned.apk"
+"$APKSIGNER" verify "$OUT/seekseek-1.0.2.apk"
 # 清掉中间产物，目录里只留成品
 rm -f "$OUT/base.apk" "$OUT/unsigned.apk" "$OUT/aligned.apk"
 
-echo "完成：$OUT/seekseek-1.0.1.apk"
-ls -la "$OUT/seekseek-1.0.1.apk" | awk '{printf "体积: %.1f MB\n", $5/1024/1024}'
+echo "完成：$OUT/seekseek-1.0.2.apk"
+ls -la "$OUT/seekseek-1.0.2.apk" | awk '{printf "体积: %.1f MB\n", $5/1024/1024}'

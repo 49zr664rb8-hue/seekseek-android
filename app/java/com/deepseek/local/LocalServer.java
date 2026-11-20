@@ -532,6 +532,7 @@ public class LocalServer {
         StringBuilder text = new StringBuilder();
         JSONArray toolCalls = new JSONArray();
         JSONArray toolResults = new JSONArray();
+        JSONArray images = new JSONArray();
 
         if (content instanceof String) {
             text.append((String) content);
@@ -556,6 +557,30 @@ public class LocalServer {
                         toolCalls.put(tc);
                     } catch (Exception ignored) {
                     }
+                } else if ("image".equals(type)) {
+                    JSONObject src = b.optJSONObject("source");
+                    if (src != null) {
+                        String url = null;
+                        String st = src.optString("type");
+                        if ("base64".equals(st)) {
+                            String data = src.optString("data", "");
+                            if (!data.isEmpty()) {
+                                url = "data:" + src.optString("media_type", "image/png") + ";base64," + data;
+                            }
+                        } else if ("url".equals(st)) {
+                            String u = src.optString("url", "");
+                            if (!u.isEmpty()) url = u;
+                        }
+                        if (url != null) {
+                            try {
+                                JSONObject part = new JSONObject();
+                                part.put("type", "image_url");
+                                part.put("image_url", new JSONObject().put("url", url));
+                                images.put(part);
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
                 } else if ("tool_result".equals(type)) {
                     toolResults.put(b);
                 }
@@ -578,11 +603,18 @@ public class LocalServer {
             return;
         }
 
-        if (!t.isEmpty()) {
+        if (!t.isEmpty() || images.length() > 0) {
             try {
                 JSONObject item = new JSONObject();
                 item.put("role", "user");
-                item.put("content", t);
+                if (images.length() > 0) {
+                    JSONArray parts = new JSONArray();
+                    if (!t.isEmpty()) parts.put(new JSONObject().put("type", "text").put("text", t));
+                    for (int i = 0; i < images.length(); i++) parts.put(images.opt(i));
+                    item.put("content", parts);
+                } else {
+                    item.put("content", t);
+                }
                 out.put(item);
             } catch (Exception ignored) {
             }
